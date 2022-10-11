@@ -4,7 +4,6 @@ class Guile:
         self.animation_path = 'assets/characters/guile/'
         self.current_animation_path = self.animation_path + '/right/idle.gif'
         self.position = 40
-        self.previous_anim = 'right_idle'
         self.current_animation = 'right_idle'
         self.current_direction = 'right'
         self.map_length = map_length

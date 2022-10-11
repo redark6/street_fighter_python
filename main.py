@@ -1,3 +1,4 @@
+import pygame.color
 from pygame import *
 
 from libraries.characters import Guile
@@ -6,6 +7,7 @@ from libraries.gifLoader import *
 
 def countKeyPressed(keys):
     return sum(x == True for x in keys)
+
 
 if __name__ == "__main__":
     # initialize game and window
@@ -61,45 +63,45 @@ if __name__ == "__main__":
 
         if animating != 1:
             if keys[K_q] and countKeyPressed(pygame.key.get_pressed()) <= 1:
-                if guile.current_animation != 'back':
-                    guile.changeAnimation('back', 'right')
+                if guile.current_animation != 'back' or (guile.current_direction != ("right" if guile.position < 500 else "left")):
+                    guile.changeAnimation('back', "right" if guile.position < 500 else "left")
                     guile_anim = loadGIF(guile.current_animation_path)
                     currentGuileFrame = 0
                 guile.move(-20, guile_anim[0].get_width())
             elif keys[K_d] and countKeyPressed(pygame.key.get_pressed()) <= 1:
-                if guile.current_animation != 'forward':
-                    guile.changeAnimation('forward', 'right')
+                if guile.current_animation != 'forward' or (guile.current_direction != ("right" if guile.position < 500 else "left")):
+                    guile.changeAnimation('forward', "right" if guile.position < 500 else "left")
                     guile_anim = loadGIF(guile.current_animation_path)
                     currentGuileFrame = 0
                 guile.move(+20, guile_anim[0].get_width())
             elif keys[K_e]:
                 animating = 1
-                guile.changeAnimation('long', 'right')
+                guile.changeAnimation('long', "right" if guile.position < 500 else "left")
                 guile_anim = loadGIF(guile.current_animation_path)
                 currentGuileFrame = 0
             elif keys[K_f]:
                 animating = 1
-                guile.changeAnimation('punch', 'right')
+                guile.changeAnimation('punch', "right" if guile.position < 500 else "left")
                 guile_anim = loadGIF(guile.current_animation_path)
                 currentGuileFrame = 0
             elif keys[K_SPACE]:
                 animating = 1
-                guile.changeAnimation('kick', 'right')
+                guile.changeAnimation('kick', "right" if guile.position < 500 else "left")
                 guile_anim = loadGIF(guile.current_animation_path)
                 currentGuileFrame = 0
             elif keys[K_f]:
                 animating = 1
-                guile.changeAnimation('punch', 'right')
+                guile.changeAnimation('punch', "right" if guile.position < 500 else "left")
                 guile_anim = loadGIF(guile.current_animation_path)
                 currentGuileFrame = 0
             elif keys[K_a]:
                 animating = 1
-                guile.changeAnimation('block', 'right')
+                guile.changeAnimation('block', "right" if guile.position < 500 else "left")
                 guile_anim = loadGIF(guile.current_animation_path)
                 currentGuileFrame = 0
             else:
                 if guile.current_animation != 'idle':
-                    guile.changeAnimation('idle', 'right')
+                    guile.changeAnimation('idle', "right" if guile.position < 500 else "left")
                     guile_anim = loadGIF(guile.current_animation_path)
                     currentGuileFrame = 0
 
