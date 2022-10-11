@@ -4,6 +4,9 @@ from libraries.characters import Guile
 from libraries.music import *
 from libraries.gifLoader import *
 
+def countKeyPressed(keys):
+    return sum(x == True for x in keys)
+
 if __name__ == "__main__":
     # initialize game and window
     pygame.init()
@@ -57,13 +60,13 @@ if __name__ == "__main__":
             count += 1
 
         if animating != 1:
-            if keys[K_q]:
+            if keys[K_q] and countKeyPressed(pygame.key.get_pressed()) <= 1:
                 if guile.current_animation != 'back':
                     guile.changeAnimation('back', 'right')
                     guile_anim = loadGIF(guile.current_animation_path)
                     currentGuileFrame = 0
                 guile.move(-20, guile_anim[0].get_width())
-            elif keys[K_d]:
+            elif keys[K_d] and countKeyPressed(pygame.key.get_pressed()) <= 1:
                 if guile.current_animation != 'forward':
                     guile.changeAnimation('forward', 'right')
                     guile_anim = loadGIF(guile.current_animation_path)
