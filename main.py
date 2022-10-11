@@ -1,7 +1,7 @@
 import pygame.color
 from pygame import *
 
-from libraries.characters import Guile
+from libraries.characters import Guile, Ryu
 from libraries.music import *
 from libraries.gifLoader import *
 
@@ -19,9 +19,14 @@ if __name__ == "__main__":
     guile = Guile(1000)
     currentFrame = 0
     currentGuileFrame = 0
+
+    ryu = Ryu(1000)
+    currentRyuFrame = 0
+
     run = True
     loadLoadAndPlayBGM("assets/audio/map-stages/air-force-base.mp3")
     guile_anim = loadGIF(guile.current_animation_path)
+    ryu_anim = loadGIF(ryu.current_animation_path)
 
     animating = 0
     count = 0
@@ -46,6 +51,10 @@ if __name__ == "__main__":
         rect_guile = guile_anim[currentGuileFrame].get_rect().move(guile.position, 240)
         window.blit(guile_anim[currentGuileFrame], rect_guile)
         currentGuileFrame = (currentGuileFrame + 1) % len(guile_anim)
+
+        rect_ryu = ryu_anim[currentRyuFrame].get_rect().move(ryu.position, 240)
+        window.blit(ryu_anim[currentRyuFrame], rect_ryu)
+        currentRyuFrame = (currentRyuFrame + 1) % len(ryu_anim)
 
         # end guile display
         # get inputs
