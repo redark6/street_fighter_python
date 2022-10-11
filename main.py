@@ -20,6 +20,8 @@ if __name__ == "__main__":
     print(guile.current_animation_path)
     guile_anim = loadGIF(guile.current_animation_path)
 
+    animating = 0
+
     while run:
 
         clock.tick(14)
@@ -49,18 +51,20 @@ if __name__ == "__main__":
 
         keys = pygame.key.get_pressed()
         if keys[K_q]:
-            if guile.current_animation != 'left_idle':
-                guile.changeAnimation('left_idle')
+            if guile.current_animation != 'left_idle' and guile.current_direction != "left":
+                guile.changeAnimation('idle', 'left')
                 guile_anim = loadGIF(guile.current_animation_path)
                 currentGuileFrame = 0
 
             print("left")
         if keys[K_d]:
-            if guile.current_animation != 'right_idle':
-                guile.changeAnimation('right_idle')
+            if guile.current_animation != 'idle' or guile.current_direction != "right":
+                guile.changeAnimation('idle', 'right')
                 guile_anim = loadGIF(guile.current_animation_path)
                 currentGuileFrame = 0
 
-            print("right")
-
+        if keys[K_e] and animating:
+            guile.changeAnimation('punch', 'right')
+            guile_anim = loadGIF(guile.current_animation_path)
+            currentGuileFrame = 0
         # end get inputs
