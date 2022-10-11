@@ -1,5 +1,5 @@
 class Guile:
-    def __init__(self):
+    def __init__(self, map_length):
         self.hp = 100
         self.animation_path = 'assets/characters/guile/'
         self.current_animation_path = self.animation_path + '/right/idle.gif'
@@ -7,6 +7,7 @@ class Guile:
         self.previous_anim = 'right_idle'
         self.current_animation = 'right_idle'
         self.current_direction = 'right'
+        self.map_length = map_length
 
     def loadAnim(self, anim):
         if anim == 'back':
@@ -35,6 +36,9 @@ class Guile:
     def takeDamage(self, amount):
         self.hp -= amount
 
-    def move(self, pixel_change):
-        self.position += pixel_change
+    def move(self, pixel_change, image_width):
+        future_position_left = self.position + pixel_change
+        future_position_right = self.position + pixel_change + image_width
+        if 0 < future_position_left < future_position_right < self.map_length:
+            self.position += pixel_change
 
