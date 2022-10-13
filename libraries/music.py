@@ -1,7 +1,7 @@
 import pygame
 
 
-def loadLoadAndPlayBGM(filename):
+def load_and_play_bgm(filename):
     pygame.mixer.music.load(filename)
     pygame.mixer.music.set_volume(1)
     pygame.mixer.music.play(-1)
