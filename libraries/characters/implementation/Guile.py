@@ -11,7 +11,10 @@ class Guile(Character):
 
     pygame.joystick.init()
     joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
-    joystick = pygame.joystick.Joystick(0)
+    if pygame.joystick.get_count() > 0:
+        joystick = pygame.joystick.Joystick(0)
+    else:
+        joystick = False
     left_control = False
     right_control = False
     punch_control = False
@@ -24,7 +27,8 @@ class Guile(Character):
 
     def actions(self, key, events):
         dx = 0
-        self.controler(events)
+        if self.joystick:
+            self.controler(events)
         if not self.is_acting and self.is_alive():
             if key[pygame.K_q] or self.left_control:
                 dx = self.backward()
@@ -55,26 +59,26 @@ class Guile(Character):
 
         for event in events:
             if event.type == pygame.JOYBUTTONDOWN:
-                if pygame.joystick.Joystick(0).get_button(1):
+                if self.joystick.get_button(1):
                     self.punch_control = True
                     #b
-                if pygame.joystick.Joystick(0).get_button(0):
+                if self.joystick.get_button(0):
                     #a
                     self.jump_control = True
-                if pygame.joystick.Joystick(0).get_button(2):
+                if self.joystick.get_button(2):
                     #x
                     self.kick_control = True
-                if pygame.joystick.Joystick(0).get_button(3):
+                if self.joystick.get_button(3):
                     #y
                     self.special_control = True
-                if pygame.joystick.Joystick(0).get_button(5):
+                if self.joystick.get_button(5):
                     #rt
                     self.parade_control = True
 
-        if pygame.joystick.Joystick(0).get_axis(0) == -1:
+        if self.joystick.get_axis(0) == -1:
             self.left_control = True
             self.right_control = False
-        elif pygame.joystick.Joystick(0).get_axis(0) > 0.9:
+        elif self.joystick.get_axis(0) > 0.9:
             self.right_control = True
             self.left_control = False
         else:
