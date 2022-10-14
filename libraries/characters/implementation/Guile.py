@@ -9,28 +9,74 @@ class Guile(Character):
     CHARACTER_DEFAULT_HEIGHT = 200
     NAME = 'guile'
 
+    pygame.joystick.init()
+    joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+    joystick = pygame.joystick.Joystick(0)
+    left_control = False
+    right_control = False
+    punch_control = False
+    kick_control = False
+    special_control = False
+    jump_control = False
+    parade_control = False
     def __init__(self, x, y, map, flip, is_player=False):
         super().__init__(x, y, map, flip, is_player)
 
-    def actions(self, key):
+    def actions(self, key, events):
         dx = 0
+        self.controler(events)
         if not self.is_acting and self.is_alive():
-            if key[pygame.K_q]:
+            if key[pygame.K_q] or self.left_control:
                 dx = self.backward()
-            elif key[pygame.K_d]:
+            elif key[pygame.K_d] or self.right_control:
                 dx = self.forward()
-            elif key[pygame.K_w] and not self.jumping:
+            elif (key[pygame.K_w] or self.jump_control) and not self.jumping:
                 self.jump()
-            elif key[pygame.K_r]:
+            elif key[pygame.K_r] or self.kick_control:
                 self.kick()
-            elif key[pygame.K_t]:
+            elif key[pygame.K_t] or self.punch_control:
                 self.punch()
-            elif key[pygame.K_y]:
+            elif key[pygame.K_y] or self.special_control:
                 self.long_punch()
-            elif key[pygame.K_u]:
+            elif key[pygame.K_u] or self.parade_control:
                 self.block_attack()
             else:
                 if self.current_animation != 'idle.gif':
                     self.load_action_frame_list('idle.gif')
                     self.currentFrame = 0
         return dx
+
+    def controler(self, events):
+        self.punch_control = False
+        self.jump_control = False
+        self.kick_control = False
+        self.special_control = False
+        self.parade_control = False
+
+        for event in events:
+            if event.type == pygame.JOYBUTTONDOWN:
+                if pygame.joystick.Joystick(0).get_button(1):
+                    self.punch_control = True
+                    #b
+                if pygame.joystick.Joystick(0).get_button(0):
+                    #a
+                    self.jump_control = True
+                if pygame.joystick.Joystick(0).get_button(2):
+                    #x
+                    self.kick_control = True
+                if pygame.joystick.Joystick(0).get_button(3):
+                    #y
+                    self.special_control = True
+                if pygame.joystick.Joystick(0).get_button(5):
+                    #rt
+                    self.parade_control = True
+
+        if pygame.joystick.Joystick(0).get_axis(0) == -1:
+            self.left_control = True
+            self.right_control = False
+        elif pygame.joystick.Joystick(0).get_axis(0) > 0.9:
+            self.right_control = True
+            self.left_control = False
+        else:
+            self.right_control = False
+            self.left_control = False

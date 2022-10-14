@@ -12,7 +12,7 @@ class Ryu(Character):
     def __init__(self, x, y, map, flip, is_player=False):
         super().__init__(x, y, map, flip, is_player)
 
-    def actions(self, key):
+    def actions(self, key, events):
         dx = 0
         if not self.is_acting and self.is_alive():
             if key[pygame.K_RIGHT]:

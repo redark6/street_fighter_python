@@ -77,6 +77,7 @@ class Character:
     def perform_action(self):
         dy = 0
         key = pygame.key.get_pressed()
+        event = pygame.event.get()
 
         if self.is_acting:
             if self.characterActionFrameList[0] == self.get_current_frame():
@@ -90,7 +91,7 @@ class Character:
                 self.completedAnim = False
 
         if not self.party_finish:
-            dx = self.actions(key)
+            dx = self.actions(key, event)
         else:
             dx = 0
 
@@ -129,7 +130,7 @@ class Character:
             else:
                 play_loose()
 
-    def actions(self, key):
+    def actions(self, key, event):
         dx = 0
         print("you should define this function for each character implementation")
         return dx
