@@ -75,11 +75,12 @@ if __name__ == "__main__":
     while run:
         clock.tick(14)
         window.fill(0)
+        events = pygame.event.get()
 
         if intro_count <= 0:
             draw_bg_and_pass_it_to_next_frame()
-            guile.perform_action()
-            ryu.perform_action()
+            guile.perform_action(events)
+            ryu.perform_action(events)
         else:
             if clock.get_time() % 2 == 0:
                 draw_bg_and_pass_it_to_next_frame()
@@ -130,7 +131,7 @@ if __name__ == "__main__":
             # fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
             # fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
 
-        for event in pygame.event.get():
+        for event in events:
             if event.type == pygame.QUIT:
                 run = False
 

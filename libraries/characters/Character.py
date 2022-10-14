@@ -74,10 +74,9 @@ class Character:
     def get_hit_box(self):
         return self.hit_box
 
-    def perform_action(self):
+    def perform_action(self, events):
         dy = 0
         key = pygame.key.get_pressed()
-        event = pygame.event.get()
 
         if self.is_acting:
             if self.characterActionFrameList[0] == self.get_current_frame():
@@ -91,7 +90,7 @@ class Character:
                 self.completedAnim = False
 
         if not self.party_finish:
-            dx = self.actions(key, event)
+            dx = self.actions(key, events)
         else:
             dx = 0
 
