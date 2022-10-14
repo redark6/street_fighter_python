@@ -174,18 +174,18 @@ class Character:
         self.jumping = True
 
     def kick(self):
-        self.load_action_frame_list('kick.gif')
         play_kick()
+        self.load_action_frame_list('kick.gif')
         self.attack(15, 0.6)
 
     def punch(self):
-        self.load_action_frame_list('punch.gif')
         play_punch()
+        self.load_action_frame_list('punch.gif')
         self.attack(10, 0.4)
 
     def long_punch(self):
-        self.load_action_frame_list('long_punch.gif')
         play_long_punch(self.NAME)
+        self.load_action_frame_list('long_punch.gif')
         self.attack(20, 0.8)
 
     def attack(self, damage, attack_surface_ratio):

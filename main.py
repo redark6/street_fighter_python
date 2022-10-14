@@ -4,13 +4,14 @@ from libraries.Map import Map
 from libraries.Window import Window
 from libraries.characters.implementation.Guile import Guile
 from libraries.characters.implementation.Ryu import Ryu
-from libraries.GifLoader import *
 from libraries.Sound import *
+from libraries.Music import stop_bgm
 
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 ORANGE = (237, 127, 20)
+pygame.mixer.init(44100, -16, 2, 64)
 
 
 def draw_bg_and_pass_it_to_next_frame():
@@ -52,6 +53,8 @@ def draw_text(text, font, text_col, x, y):
 
 if __name__ == "__main__":
     # initialize game and window
+    pygame.mixer.pre_init(44100, -16, 2, 512)
+    pygame.mixer.init()
     pygame.init()
     count_font = pygame.font.Font("assets/fonts/street_fighter.ttf", 100)
     score_font = pygame.font.Font("assets/fonts/street_fighter.ttf", 30)
@@ -94,7 +97,7 @@ if __name__ == "__main__":
                 intro_count -= 1
                 last_count_update = pygame.time.get_ticks()
 
-            if (pygame.time.get_ticks() - last_count_update) >= 875:
+            if (pygame.time.get_ticks() - last_count_update) >= 864:
                 sound_count -= 1
                 if sound_count == 4:
                     play_three()
@@ -120,6 +123,9 @@ if __name__ == "__main__":
                 round_over_time = pygame.time.get_ticks()
                 guile.perform_last_sound()
                 ryu.perform_last_sound()
+                stop_bgm()
+                play_ending()
+
 
         else:
             draw_character_final_msg(guile, ryu)

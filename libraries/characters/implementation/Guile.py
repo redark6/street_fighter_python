@@ -37,7 +37,7 @@ class Guile(Character):
             elif key[pygame.K_y] or self.special_control:
                 self.long_punch()
                 if self.joystick:
-                    self.joystick.rumble(100, 100, 300)
+                    self.joystick.rumble(10000000, 1000000, 400)
             elif key[pygame.K_u] or self.parade_control:
                 self.block_attack()
             else:

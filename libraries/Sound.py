@@ -42,3 +42,6 @@ def play_three():
 
 def play_fight():
     load_and_play_sound("common/fight.mp3")
+
+def play_ending():
+    load_and_play_sound("common/ending.mp3")
