@@ -30,13 +30,13 @@ def draw_character_last_state(character):
 def draw_character_final_msg(char1, char2):
     if (char1.is_player and not char2.is_player) or (not char1.is_player and char2.is_player):
         if not char1.is_alive() and not char2.is_alive():
-            draw_text("Draw", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+            draw_text("Draw", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 3)
         elif (char1.is_player and char1.is_alive()) or char2.is_player and char2.is_alive():
-            draw_text("Victory", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+            draw_text("Victory", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 3)
         elif (char1.is_player and not char1.is_alive()) or (char2.is_player and not char2.is_alive()):
-            draw_text("Defeat", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+            draw_text("Defeat", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 3)
     else:
-        draw_text("Finish", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+        draw_text("Finish", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 3)
 
 
 def draw_health_bar(health_ration, x, y):
