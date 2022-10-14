@@ -9,7 +9,7 @@ class Map:
     def __init__(self):
         self.mapFrameList = None
         self.currentFrame = 0
-        # load_and_play_bgm("assets/audio/map-stages/air-force-base.mp3")
+        load_and_play_bgm("assets/audio/map-stages/air-force-base.mp3")
 
     def load_map_frame_list(self):
         self.mapFrameList = load_gif("assets/map/air-force-base.gif")
