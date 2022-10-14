@@ -1,24 +1,27 @@
 import pygame
 
-from libraries.gifLoader import load_gif
+from libraries.GifLoader import load_gif
+from libraries.Sound import *
 
 
 class Character:
     BASE_ANIMATION_PATH = 'assets/characters/'
     CHARACTER_ANIMATION_PATH = 'todefine/'
+    NAME = ''
     SPEED = 20
     GRAVITY = 5
     MAX_HEALTH = 100
     CHARACTER_DEFAULT_WIDTH = 162
     CHARACTER_DEFAULT_HEIGHT = 200
 
-    def __init__(self, x, y, map, flip):
+    def __init__(self, x, y, map, flip, is_player=False):
         self.completedAnim = False
         self.characterActionFrameList = None
         self.enemy = None
         self.hit_box = pygame.Rect((x, y, self.CHARACTER_DEFAULT_WIDTH, self.CHARACTER_DEFAULT_HEIGHT))
         self.vel_y = 0
         self.map = map
+        self.is_player = is_player
 
         self.damage_ratio = 1
 
@@ -119,6 +122,13 @@ class Character:
         else:
             self.die()
 
+    def perform_last_sound(self):
+        if self.is_player:
+            if self.is_alive():
+                play_win()
+            else:
+                play_loose()
+
     def actions(self, key):
         dx = 0
         print("you should define this function for each character implementation")
@@ -159,14 +169,17 @@ class Character:
 
     def kick(self):
         self.load_action_frame_list('kick.gif')
+        play_kick()
         self.attack(15, 0.6)
 
     def punch(self):
         self.load_action_frame_list('punch.gif')
+        play_punch()
         self.attack(10, 0.4)
 
     def long_punch(self):
         self.load_action_frame_list('long_punch.gif')
+        play_long_punch(self.NAME)
         self.attack(20, 0.8)
 
     def attack(self, damage, attack_surface_ratio):

@@ -7,9 +7,10 @@ class Guile(Character):
     CHARACTER_ANIMATION_PATH = 'guile/'
     CHARACTER_DEFAULT_WIDTH = 162
     CHARACTER_DEFAULT_HEIGHT = 200
+    NAME = 'guile'
 
-    def __init__(self, x, y, map, flip):
-        super().__init__(x, y, map, flip)
+    def __init__(self, x, y, map, flip, is_player=False):
+        super().__init__(x, y, map, flip, is_player)
 
     def actions(self, key):
         dx = 0

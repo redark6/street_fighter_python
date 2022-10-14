@@ -1,5 +1,5 @@
-from libraries.gifLoader import load_gif
-from libraries.music import load_and_play_bgm
+from libraries.GifLoader import load_gif
+from libraries.Music import load_and_play_bgm
 
 
 class Map:

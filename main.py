@@ -4,7 +4,8 @@ from libraries.Map import Map
 from libraries.Window import Window
 from libraries.characters.implementation.Guile import Guile
 from libraries.characters.implementation.Ryu import Ryu
-from libraries.gifLoader import *
+from libraries.GifLoader import *
+from libraries.Sound import *
 
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
@@ -26,6 +27,18 @@ def draw_character_last_state(character):
     character.perform_last_animation()
 
 
+def draw_character_final_msg(char1, char2):
+    if (char1.is_player and not char2.is_player) or (not char1.is_player and char2.is_player):
+        if not char1.is_alive() and not char2.is_alive():
+            draw_text("Draw", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+        elif (char1.is_player and char1.is_alive()) or char2.is_player and char2.is_alive():
+            draw_text("Victory", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+        elif (char1.is_player and not char1.is_alive()) or (char2.is_player and not char2.is_alive()):
+            draw_text("Defeat", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+    else:
+        draw_text("Finish", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+
+
 def draw_health_bar(health_ration, x, y):
     pygame.draw.rect(window.get_window(), WHITE, (x - 2, y - 2, 404, 34))
     pygame.draw.rect(window.get_window(), RED, (x, y, 400, 30))
@@ -43,6 +56,7 @@ if __name__ == "__main__":
     count_font = pygame.font.Font("assets/fonts/street_fighter.ttf", 100)
     score_font = pygame.font.Font("assets/fonts/street_fighter.ttf", 30)
     intro_count = 4
+    sound_count = 5
     round_over = False
 
     map = Map()
@@ -51,7 +65,7 @@ if __name__ == "__main__":
     clock = pygame.time.Clock()
     last_count_update = pygame.time.get_ticks()
 
-    guile = Guile(200, map.HEIGHT - 210, map, False)
+    guile = Guile(200, map.HEIGHT - 210, map, False, True)
     ryu = Ryu(700, map.HEIGHT - 210, map, True)
     ryu.set_ennemy(guile)
     guile.set_ennemy(ryu)
@@ -79,6 +93,17 @@ if __name__ == "__main__":
                 intro_count -= 1
                 last_count_update = pygame.time.get_ticks()
 
+            if (pygame.time.get_ticks() - last_count_update) >= 875:
+                sound_count -= 1
+                if sound_count == 4:
+                    play_three()
+                elif sound_count == 3:
+                    play_two()
+                elif sound_count == 2:
+                    play_one()
+                elif sound_count == 1:
+                    play_fight()
+
         draw_health_bar(guile.get_hp_ratio(), 20, 20)
         draw_health_bar(ryu.get_hp_ratio(), 580, 20)
         draw_text("Guile:", score_font, RED, 20, 60)
@@ -92,8 +117,11 @@ if __name__ == "__main__":
                 # score[0] += 1
                 round_over = True
                 round_over_time = pygame.time.get_ticks()
+                guile.perform_last_sound()
+                ryu.perform_last_sound()
+
         else:
-            draw_text("Victory", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+            draw_character_final_msg(guile, ryu)
             draw_character_last_state(guile)
             draw_character_last_state(ryu)
             # if pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
