@@ -1,21 +1,22 @@
 import pygame
 
-from libraries.gifLoader import loadGIF
+from libraries.gifLoader import load_gif
 
 
 class Character:
-    BASE_ANIMATION_PATH = 'assets/characters'
+    BASE_ANIMATION_PATH = 'assets/characters/'
+    CHARACTER_ANIMATION_PATH = 'todefine/'
     SPEED = 20
     GRAVITY = 5
     MAX_HEALTH = 100
     CHARACTER_DEFAULT_WIDTH = 162
     CHARACTER_DEFAULT_HEIGHT = 200
 
-    def __init__(self, x, y, map):
+    def __init__(self, x, y, map, flip):
         self.completedAnim = False
         self.characterActionFrameList = None
         self.enemy = None
-        self.rect = pygame.Rect((x, y, self.CHARACTER_DEFAULT_WIDTH, self.CHARACTER_DEFAULT_HEIGHT))
+        self.hit_box = pygame.Rect((x, y, self.CHARACTER_DEFAULT_WIDTH, self.CHARACTER_DEFAULT_HEIGHT))
         self.vel_y = 0
         self.map = map
 
@@ -23,21 +24,19 @@ class Character:
 
         self.jumping = False
         self.attacking = False
-        self.flip = False
+        self.flip = flip
         self.is_acting = False
+        self.party_finish = False
 
-        # self.map_length = map_length
         self.hp = self.MAX_HEALTH
         self.currentFrame = 0
         self.load_action_frame_list("idle.gif")
         self.current_animation = "idle.gif"
-        # self.position = positon
 
-        # self.current_animation_path = self.animation_path + '/right/idle.gif'
-
+    # functions used to display player
     def load_action_frame_list(self, action):
         self.current_animation = action
-        self.characterActionFrameList = loadGIF(self.BASE_ANIMATION_PATH + "/guile/" + action)
+        self.characterActionFrameList = load_gif(self.BASE_ANIMATION_PATH + self.CHARACTER_ANIMATION_PATH + action)
 
     def get_current_frame(self):
         return self.characterActionFrameList[self.currentFrame]
@@ -47,14 +46,21 @@ class Character:
 
     def get_current_frame_rect(self):
         if self.attacking and self.flip:
-            shift = self.rect.left - (self.get_current_frame().get_width() - self.CHARACTER_DEFAULT_WIDTH)
+            shift = self.hit_box.left - (self.get_current_frame().get_width() - self.CHARACTER_DEFAULT_WIDTH)
         else:
-            shift = self.rect.left
-        return self.get_fliped_current_frame().get_rect().move( shift , self.rect.top)
+            shift = self.hit_box.left
+        return self.get_fliped_current_frame().get_rect().move(shift, self.hit_box.top)
 
-    # self.map.HEIGHT - self.get_current_frame().get_height() + self.rect.centery
     def pass_to_next_frame(self):
-        self.currentFrame = (self.currentFrame + 1) % len(self.characterActionFrameList)
+        if self.party_finish and self.currentFrame == len(self.characterActionFrameList) - 1 and \
+                (self.current_animation == "win.gif" or self.current_animation == "ko.gif"):
+            self.currentFrame = len(self.characterActionFrameList) - 1
+        else:
+            self.currentFrame = (self.currentFrame + 1) % len(self.characterActionFrameList)
+
+    # function to get player status
+    def is_alive(self):
+        return self.hp > 0
 
     def set_ennemy(self, enemy):
         self.enemy = enemy
@@ -62,10 +68,11 @@ class Character:
     def get_hp_ratio(self):
         return self.hp / self.MAX_HEALTH
 
-    def move(self, surface):
-        dx = 0
-        dy = 0
+    def get_hit_box(self):
+        return self.hit_box
 
+    def perform_action(self):
+        dy = 0
         key = pygame.key.get_pressed()
 
         if self.is_acting:
@@ -74,199 +81,105 @@ class Character:
             if self.completedAnim:
                 self.attacking = False
                 self.is_acting = False
+                self.damage_ratio = 1
                 self.load_action_frame_list('idle.gif')
                 self.currentFrame = 0
                 self.completedAnim = False
 
-        if not self.is_acting:
-            if key[pygame.K_q]:
-                # self.is_acting = True
-                dx -= self.SPEED
-                self.load_action_frame_list('backward.gif')
-
-            elif key[pygame.K_d]:
-                # self.is_acting = True
-                dx += self.SPEED
-                self.load_action_frame_list('forward.gif')
-
-            elif key[pygame.K_w] and not self.jumping:
-                self.vel_y -= 35
-                self.jumping = True
-                # self.is_acting = True
-
-            elif key[pygame.K_r]:
-                self.is_acting = True
-                self.load_action_frame_list('kick.gif')
-                self.attack(surface)
-
-            elif key[pygame.K_t]:
-                self.is_acting = True
-                self.load_action_frame_list('punch.gif')
-                self.attack(surface)
-
-            elif key[pygame.K_y]:
-                self.is_acting = True
-                self.load_action_frame_list('long_punch.gif')
-                self.attack(surface)
-
-            elif key[pygame.K_u]:
-                self.is_acting = True
-                self.damage_ratio = 0.5
-                self.load_action_frame_list('block.gif')
-                #self.attack(surface)
-            else:
-                if self.current_animation != 'idle.gif':
-                    self.load_action_frame_list('idle.gif')
-                    self.currentFrame = 0
+        if not self.party_finish:
+            dx = self.actions(key)
+        else:
+            dx = 0
 
         self.vel_y += self.GRAVITY
         dy += self.vel_y
 
-        if self.rect.left + dx < 0:
-            dx = - self.rect.left
-        if self.rect.right + dx > self.map.WIDTH:
-            dx = self.map.WIDTH - self.rect.right
+        if self.hit_box.left + dx < 0:
+            dx = - self.hit_box.left
+        if self.hit_box.right + dx > self.map.WIDTH:
+            dx = self.map.WIDTH - self.hit_box.right
 
-        if self.rect.bottom + dy > self.map.HEIGHT - 10:
+        if self.hit_box.bottom + dy > self.map.HEIGHT - 10:
             self.vel_y = 0
             self.jumping = False
-            dy = self.map.HEIGHT - 10 - self.rect.bottom
+            dy = self.map.HEIGHT - 10 - self.hit_box.bottom
 
-        if self.enemy.get_rect().centerx > self.rect.centerx:
+        if self.enemy.get_hit_box().centerx > self.hit_box.centerx:
             self.flip = False
         else:
             self.flip = True
 
-        self.rect.x += dx
-        self.rect.y += dy
+        self.hit_box.x += dx
+        self.hit_box.y += dy
 
-    def forward(self):
-        return 0
-
-    def backward(self):
-        return 0
-
-    def attack(self, surface):
-        self.attacking = True
-
-        if self.flip:
-            shift = self.rect.left - (self.get_current_frame().get_width() - self.CHARACTER_DEFAULT_WIDTH)
+    def perform_last_animation(self):
+        self.party_finish = True
+        if self.is_alive():
+            self.win()
         else:
-            shift = self.rect.left
+            self.die()
 
-        frame = self.get_current_frame()
-        attacking_rect = pygame.Rect(self.rect.centerx, shift, frame.get_width() - self.CHARACTER_DEFAULT_WIDTH,
-                                     frame.get_height())
-        if attacking_rect.colliderect(self.enemy.get_rect()):
-            self.enemy.take_damage(10)
-        pygame.draw.rect(surface, (0, 0, 255), attacking_rect)
+    def actions(self, key):
+        dx = 0
+        print("you should define this function for each character implementation")
+        return dx
 
-    def get_rect(self):
-        return self.rect
+    def die(self):
+        self.load_action_frame_list('ko.gif')
+
+    def win(self):
+        self.load_action_frame_list('win.gif')
 
     def take_damage(self, damage):
         self.hp -= damage * self.damage_ratio
 
-    def draw(self, surface):
-        truc = 1
-        #pygame.draw.rect(surface, (255, 0, 0), self.rect)
+    # players actions
+    def block_attack(self):
+        self.damage_ratio = 0.5
+        self.load_action_frame_list('block.gif')
+        self.is_acting = True
 
+    def forward(self):
+        if self.flip:
+            self.load_action_frame_list('backward.gif')
+        else:
+            self.load_action_frame_list('forward.gif')
+        return self.SPEED
 
-""""
-    def evaluate_animation_direction(self):
-    def idle(self):
-    def move(self):
-    def punch(self):
-        self.changeAnimation('block', "right" if guile.position < 500 else "left")
-    def long_punch(self):
+    def backward(self):
+        if self.flip:
+            self.load_action_frame_list('forward.gif')
+        else:
+            self.load_action_frame_list('forward.gif')
+        return - self.SPEED
+
+    def jump(self):
+        self.vel_y -= 35
+        self.jumping = True
+
     def kick(self):
-    def parry(self):
-"""
+        self.load_action_frame_list('kick.gif')
+        self.attack(15, 0.6)
 
+    def punch(self):
+        self.load_action_frame_list('punch.gif')
+        self.attack(10, 0.4)
 
-class Guile:
-    def __init__(self, map_length):
-        self.hp = 100
-        self.animation_path = 'assets/characters/guile/'
-        self.current_animation_path = self.animation_path + '/right/idle.gif'
-        self.position = 0
-        self.current_animation = 'idle'
-        self.current_direction = 'right'
-        self.map_length = map_length
+    def long_punch(self):
+        self.load_action_frame_list('long_punch.gif')
+        self.attack(20, 0.8)
 
-    def loadAnim(self, anim):
-        if anim == 'back':
-            return 'back.gif'
-        elif anim == 'block':
-            return 'block.gif'
-        elif anim == 'forward':
-            return 'forward.gif'
-        elif anim == 'idle':
-            return 'idle.gif'
-        elif anim == 'kick':
-            return 'kick.gif'
-        elif anim == 'long':
-            return 'long.gif'
-        elif anim == 'punch':
-            return 'punch.gif'
-        elif anim == 'win':
-            return 'win.gif'
+    def attack(self, damage, attack_surface_ratio):
+        self.attacking = True
+        self.is_acting = True
+        frame = self.get_current_frame()
 
-    def changeAnimation(self, anim, direction):
-        loaded_animation = self.loadAnim(anim)
-        self.current_animation_path = self.animation_path + direction + "/" + loaded_animation
-        self.current_animation = anim
-        self.current_direction = direction
+        if self.flip:
+            shift = self.hit_box.left - (self.get_current_frame().get_width() - self.CHARACTER_DEFAULT_WIDTH)
+        else:
+            shift = self.hit_box.right
 
-    def takeDamage(self, amount):
-        self.hp -= amount
-
-    def move(self, pixel_change, image_width):
-        future_position_left = self.position + pixel_change
-        future_position_right = self.position + pixel_change + image_width
-        if 0 < future_position_left < future_position_right < self.map_length:
-            self.position += pixel_change
-
-
-class Ryu:
-    def __init__(self, map_length):
-        self.hp = 100
-        self.animation_path = 'assets/characters/ryu/'
-        self.current_animation_path = self.animation_path + '/left/idle.gif'
-        self.position = 900
-        self.current_animation = 'idle'
-        self.current_direction = 'left'
-        self.map_length = map_length
-
-    def loadAnim(self, anim):
-        if anim == 'back':
-            return 'back.gif'
-        elif anim == 'block':
-            return 'block.gif'
-        elif anim == 'forward':
-            return 'forward.gif'
-        elif anim == 'idle':
-            return 'idle.gif'
-        elif anim == 'kick':
-            return 'kick.gif'
-        elif anim == 'long':
-            return 'long.gif'
-        elif anim == 'punch':
-            return 'punch.gif'
-        elif anim == 'win':
-            return 'win.gif'
-
-    def changeAnimation(self, anim, direction):
-        loaded_animation = self.loadAnim(anim)
-        self.current_animation_path = self.animation_path + direction + "/" + loaded_animation
-        self.current_animation = anim
-        self.current_direction = direction
-
-    def takeDamage(self, amount):
-        self.hp -= amount
-
-    def move(self, pixel_change, image_width):
-        future_position_left = self.position + pixel_change
-        future_position_right = self.position + pixel_change + image_width
-        if 0 < future_position_left < future_position_right < self.map_length:
-            self.position += pixel_change
+        attacking_rect = pygame.Rect(shift, self.hit_box.top, frame.get_width() - self.CHARACTER_DEFAULT_WIDTH,
+                                     frame.get_height() * attack_surface_ratio)
+        if attacking_rect.colliderect(self.enemy.get_hit_box()):
+            self.enemy.take_damage(damage)

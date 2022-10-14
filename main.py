@@ -1,164 +1,110 @@
 import pygame.display
-from pygame import *
 
 from libraries.Map import Map
 from libraries.Window import Window
-from libraries.characters.Character import Character
-from libraries.characters.implementation import Ryu, Guile
+from libraries.characters.implementation.Guile import Guile
+from libraries.characters.implementation.Ryu import Ryu
 from libraries.gifLoader import *
-from libraries.music import load_and_play_bgm
-
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 440
 
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
+ORANGE = (237, 127, 20)
 
 
-def countKeyPressed(keys):
-    return sum(x == True for x in keys)
+def draw_bg_and_pass_it_to_next_frame():
+    window.blit(map.get_current_frame(), map.get_current_frame_rect())
+    map.pass_to_next_frame()
+
+
+def draw_character_and_pass_it_to_next_frame(character):
+    window.blit(character.get_fliped_current_frame(), character.get_current_frame_rect())
+    character.pass_to_next_frame()
+
+
+def draw_character_last_state(character):
+    character.perform_last_animation()
+
+
+def draw_health_bar(health_ration, x, y):
+    pygame.draw.rect(window.get_window(), WHITE, (x - 2, y - 2, 404, 34))
+    pygame.draw.rect(window.get_window(), RED, (x, y, 400, 30))
+    pygame.draw.rect(window.get_window(), YELLOW, (x, y, 400 * health_ration, 30))
+
+
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    window.blit(img, (x, y))
 
 
 if __name__ == "__main__":
     # initialize game and window
     pygame.init()
+    count_font = pygame.font.Font("assets/fonts/street_fighter.ttf", 100)
+    score_font = pygame.font.Font("assets/fonts/street_fighter.ttf", 30)
+    intro_count = 4
+    round_over = False
 
     map = Map()
     window = Window(map)
     map.load_map_frame_list()
-
     clock = pygame.time.Clock()
+    last_count_update = pygame.time.get_ticks()
 
-    # mapFrameList = loadGIF("assets/map/air-force-base.gif")
-    # guile = Guile(1000)
-    # currentFrame = 0
-    # currentGuileFrame = 0
-
-    # ryu = Ryu(1000)
-    # currentRyuFrame = 0
-    guile = Character(200, 430, map)
-    ryu = Character(700, 430, map)
+    guile = Guile(200, map.HEIGHT - 210, map, False)
+    ryu = Ryu(700, map.HEIGHT - 210, map, True)
     ryu.set_ennemy(guile)
     guile.set_ennemy(ryu)
+
     run = True
-
-    # guile_anim = loadGIF(guile.current_animation_path)
-    # ryu_anim = loadGIF(ryu.current_animation_path)
-
-    """
-    animating = 0
-    count = 0
-    completedAnim = False
- """
-
-
-    def draw_bg_and_pass_it_to_next_frame():
-        window.blit(map.get_current_frame(), map.get_current_frame_rect())
-        map.pass_to_next_frame()
-
-    def draw_character_and_pass_it_to_next_frame():
-        window.blit(guile.get_fliped_current_frame(), guile.get_current_frame_rect())
-        guile.pass_to_next_frame()
-
-    def draw_character_and_pass_it_to_next_frame_2():
-        window.blit(ryu.get_fliped_current_frame(), ryu.get_current_frame_rect())
-        ryu.pass_to_next_frame()
-
-    def draw_health_bar(health_ration, x, y):
-        pygame.draw.rect(window.get_window(), WHITE, (x - 2, y - 2, 404, 34))
-        pygame.draw.rect(window.get_window(), RED, (x, y, 400, 30))
-        pygame.draw.rect(window.get_window(), YELLOW, (x, y, 400 * health_ration, 30))
-
 
     while run:
         clock.tick(14)
         window.fill(0)
 
-        draw_bg_and_pass_it_to_next_frame()
-        draw_character_and_pass_it_to_next_frame()
-        draw_character_and_pass_it_to_next_frame_2()
+        if intro_count <= 0:
+            draw_bg_and_pass_it_to_next_frame()
+            guile.perform_action()
+            ryu.perform_action()
+        else:
+            if clock.get_time() % 2 == 0:
+                draw_bg_and_pass_it_to_next_frame()
 
-        draw_health_bar(ryu.get_hp_ratio(), 20, 20)
-        draw_health_bar(guile.get_hp_ratio(), 580, 20)
-        guile.move(window.get_window())
-        ryu.move(window.get_window())
+            if intro_count == 1:
+                draw_text("Fight !", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+            else:
+                draw_text(str(intro_count - 1), count_font, ORANGE, map.WIDTH / 2, map.HEIGHT / 2)
 
-        guile.draw(window.get_window())
-        ryu.draw(window.get_window())
+            if (pygame.time.get_ticks() - last_count_update) >= 1000:
+                intro_count -= 1
+                last_count_update = pygame.time.get_ticks()
+
+        draw_health_bar(guile.get_hp_ratio(), 20, 20)
+        draw_health_bar(ryu.get_hp_ratio(), 580, 20)
+        draw_text("Guile:", score_font, RED, 20, 60)
+        draw_text("Ryu:", score_font, RED, 580, 60)
+        draw_character_and_pass_it_to_next_frame(guile)
+        draw_character_and_pass_it_to_next_frame(ryu)
+
+        if not round_over:
+            if not guile.is_alive() or not ryu.is_alive():
+                # score[1] += 1
+                # score[0] += 1
+                round_over = True
+                round_over_time = pygame.time.get_ticks()
+        else:
+            draw_text("Victory", count_font, RED, map.WIDTH / 2 - 120, map.HEIGHT / 2)
+            draw_character_last_state(guile)
+            draw_character_last_state(ryu)
+            # if pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
+            # round_over = False
+            # intro_count = 3
+            # fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
+            # fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
-        # to have better fps adjustment for bg map
-        # if clock.get_time() % 2 == 0 :
-        # map display
-
-        # end map display
-        """
-        # guile display
-        rect_guile = guile_anim[currentGuileFrame].get_rect().move(guile.position, 240)
-        window.blit(guile_anim[currentGuileFrame], rect_guile)
-        currentGuileFrame = (currentGuileFrame + 1) % len(guile_anim)
-
-        rect_ryu = ryu_anim[currentRyuFrame].get_rect().move(ryu.position, 240)
-        window.blit(ryu_anim[currentRyuFrame], rect_ryu)
-        currentRyuFrame = (currentRyuFrame + 1) % len(ryu_anim)
- """
-        # end guile display
-        # get inputs
-        """
-        keys = pygame.key.get_pressed()
-        if animating == 1:
-            if guile_anim[0] == guile_anim[currentGuileFrame]:
-                completedAnim = True
-            if completedAnim:
-                animating = 0
-                guile.changeAnimation('idle', 'right')
-                guile_anim = loadGIF(guile.current_animation_path)
-                currentGuileFrame = 0
-                completedAnim = False
-            count += 1
-
-        if animating != 1:
-            if keys[K_q] and countKeyPressed(pygame.key.get_pressed()) <= 1:
-                if guile.current_animation != 'back' or (guile.current_direction != ("right" if guile.position < 500 else "left")):
-                    guile.changeAnimation('back', "right" if guile.position < 500 else "left")
-                    guile_anim = loadGIF(guile.current_animation_path)
-                    currentGuileFrame = 0
-                guile.move(-20, guile_anim[0].get_width())
-            elif keys[K_d] and countKeyPressed(pygame.key.get_pressed()) <= 1:
-                if guile.current_animation != 'forward' or (guile.current_direction != ("right" if guile.position < 500 else "left")):
-                    guile.changeAnimation('forward', "right" if guile.position < 500 else "left")
-                    guile_anim = loadGIF(guile.current_animation_path)
-                    currentGuileFrame = 0
-                guile.move(+20, guile_anim[0].get_width())
-            elif keys[K_e]:
-                animating = 1
-                guile.changeAnimation('long', "right" if guile.position < 500 else "left")
-                guile_anim = loadGIF(guile.current_animation_path)
-                currentGuileFrame = 0
-            elif keys[K_SPACE]:
-                animating = 1
-                guile.changeAnimation('kick', "right" if guile.position < 500 else "left")
-                guile_anim = loadGIF(guile.current_animation_path)
-                currentGuileFrame = 0
-            elif keys[K_f]:
-                animating = 1
-                guile.changeAnimation('punch', "right" if guile.position < 500 else "left")
-                guile_anim = loadGIF(guile.current_animation_path)
-                currentGuileFrame = 0
-            elif keys[K_a]:
-                animating = 1
-                guile.changeAnimation('block', "right" if guile.position < 500 else "left")
-                guile_anim = loadGIF(guile.current_animation_path)
-                currentGuileFrame = 0
-            else:
-                if guile.current_animation != 'idle':
-                    guile.changeAnimation('idle', "right" if guile.position < 500 else "left")
-                    guile_anim = loadGIF(guile.current_animation_path)
-                    currentGuileFrame = 0
- """
         pygame.display.flip()
-        # end get inputs
+    # end get inputs

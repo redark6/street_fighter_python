@@ -1,47 +1,35 @@
+import pygame
+
 from libraries.characters.Character import Character
 
+
 class Ryu(Character):
+    CHARACTER_ANIMATION_PATH = 'ryu/'
+    CHARACTER_DEFAULT_WIDTH = 108
+    CHARACTER_DEFAULT_HEIGHT = 200
 
-    character_animation_path = 'ryu'
+    def __init__(self, x, y, map, flip):
+        super().__init__(x, y, map, flip)
 
-    def __init__(self, map_length):
-        self.hp = 100
-        self.animation_path = 'assets/characters/ryu/'
-        self.current_animation_path = self.animation_path + '/left/idle.gif'
-        self.position = 900
-        self.current_animation = 'idle'
-        self.current_direction = 'left'
-        self.map_length = map_length
-
-    def loadAnim(self, anim):
-        if anim == 'back':
-            return 'back.gif'
-        elif anim == 'block':
-            return 'block.gif'
-        elif anim == 'forward':
-            return 'forward.gif'
-        elif anim == 'idle':
-            return 'idle.gif'
-        elif anim == 'kick':
-            return 'kick.gif'
-        elif anim == 'long':
-            return 'long.gif'
-        elif anim == 'punch':
-            return 'punch.gif'
-        elif anim == 'win':
-            return 'win.gif'
-
-    def changeAnimation(self, anim, direction):
-        loaded_animation = self.loadAnim(anim)
-        self.current_animation_path = self.animation_path + direction + "/" + loaded_animation
-        self.current_animation = anim
-        self.current_direction = direction
-
-    def takeDamage(self, amount):
-        self.hp -= amount
-
-    def move(self, pixel_change, image_width):
-        future_position_left = self.position + pixel_change
-        future_position_right = self.position + pixel_change + image_width
-        if 0 < future_position_left < future_position_right < self.map_length:
-            self.position += pixel_change
+    def actions(self, key):
+        dx = 0
+        if not self.is_acting and self.is_alive():
+            if key[pygame.K_RIGHT]:
+                dx = self.backward()
+            elif key[pygame.K_LEFT]:
+                dx = self.forward()
+            elif key[pygame.K_UP] and not self.jumping:
+                self.jump()
+            elif key[pygame.K_c]:
+                self.kick()
+            elif key[pygame.K_v]:
+                self.punch()
+            elif key[pygame.K_b]:
+                self.long_punch()
+            elif key[pygame.K_DOWN]:
+                self.block_attack()
+            else:
+                if self.current_animation != 'idle.gif':
+                    self.load_action_frame_list('idle.gif')
+                    self.currentFrame = 0
+        return dx
