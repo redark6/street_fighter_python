@@ -14,6 +14,12 @@ class Character:
     CHARACTER_DEFAULT_WIDTH = 162
     CHARACTER_DEFAULT_HEIGHT = 200
 
+    pygame.joystick.init()
+    joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+    if pygame.joystick.get_count() > 0:
+        joystick = pygame.joystick.Joystick(0)
+    else:
+        joystick = False
     def __init__(self, x, y, map, flip, is_player=False):
         self.completedAnim = False
         self.characterActionFrameList = None

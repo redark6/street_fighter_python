@@ -9,12 +9,6 @@ class Guile(Character):
     CHARACTER_DEFAULT_HEIGHT = 200
     NAME = 'guile'
 
-    pygame.joystick.init()
-    joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
-    if pygame.joystick.get_count() > 0:
-        joystick = pygame.joystick.Joystick(0)
-    else:
-        joystick = False
     left_control = False
     right_control = False
     punch_control = False
@@ -42,6 +36,8 @@ class Guile(Character):
                 self.punch()
             elif key[pygame.K_y] or self.special_control:
                 self.long_punch()
+                if self.joystick:
+                    self.joystick.rumble(100, 100, 300)
             elif key[pygame.K_u] or self.parade_control:
                 self.block_attack()
             else:
@@ -49,6 +45,11 @@ class Guile(Character):
                     self.load_action_frame_list('idle.gif')
                     self.currentFrame = 0
         return dx
+
+    def take_damage(self, damage):
+        self.hp -= damage * self.damage_ratio
+        if self.joystick:
+            self.joystick.rumble(100, 100, 300)
 
     def controler(self, events):
         self.punch_control = False
