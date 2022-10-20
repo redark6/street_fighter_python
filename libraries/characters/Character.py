@@ -202,3 +202,11 @@ class Character:
                                      frame.get_height() * attack_surface_ratio)
         if attacking_rect.colliderect(self.enemy.get_hit_box()):
             self.enemy.take_damage(damage)
+
+    def distance(self):
+        player_position = self.hit_box.x
+        ryu_position = self.enemy.get_hit_box().x
+
+        distance = player_position - ryu_position
+
+        return distance
