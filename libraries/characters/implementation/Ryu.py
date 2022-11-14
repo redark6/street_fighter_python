@@ -1,16 +1,27 @@
 import pygame
 
+from libraries.Sound import *
+from libraries.characters.Attack import Attack
 from libraries.characters.Character import Character
 
 
 class Ryu(Character):
+    ATTACK_PUNCH = Attack('PUNCH', 'punch.gif', 10, (194, 200), 0.4, play_punch)
+    ATTACK_KICK = Attack('KICK', 'kick.gif', 15, (213, 200), 0.6, play_kick)
+    ATTACK_LONG_PUNCH = Attack('LONG_PUNCH', 'long_punch.gif', 20, (326, 200), 0.8, play_long_punch)
+
+    #ATTACK_PUNCH = Attack('PUNCH', 'punch.gif', 10, (310, 200), 0.4, play_punch)
+    #ATTACK_KICK = Attack('KICK', 'kick.gif', 15, (233, 200), 0.6, play_kick)
+    #ATTACK_LONG_PUNCH = Attack('LONG_PUNCH', 'long_punch.gif', 20, (440, 200), 0.8, play_long_punch)
+
+
     CHARACTER_ANIMATION_PATH = 'ryu/'
     CHARACTER_DEFAULT_WIDTH = 108
     CHARACTER_DEFAULT_HEIGHT = 200
     NAME = 'ryu'
 
-    def __init__(self, x, y, map, flip, is_player=False):
-        super().__init__(x, y, map, flip, is_player)
+    def __init__(self, x, y, map, flip, is_player=False, train=False):
+        super().__init__(x, y, map, flip, is_player, train)
 
     def actions(self, key, events):
         dx = 0
@@ -30,7 +41,6 @@ class Ryu(Character):
             elif key[pygame.K_DOWN]:
                 self.block_attack()
             else:
-                if self.current_animation != 'idle.gif':
-                    self.load_action_frame_list('idle.gif')
-                    self.currentFrame = 0
+                self.animation_sound_helper.reset_animation()
+
         return dx

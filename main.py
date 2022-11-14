@@ -6,12 +6,17 @@ from libraries.characters.implementation.Guile import Guile
 from libraries.characters.implementation.Ryu import Ryu
 from libraries.Sound import *
 from libraries.Music import stop_bgm
+import matplotlib.pyplot as plt
+from random import *
 
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 ORANGE = (237, 127, 20)
 pygame.mixer.init(44100, -16, 2, 64)
+
+FILE_RYU = 'ryu.al2'
+FILE_GUILE = 'guile.al2'
 
 
 def draw_bg_and_pass_it_to_next_frame():
@@ -20,7 +25,7 @@ def draw_bg_and_pass_it_to_next_frame():
 
 
 def draw_character_and_pass_it_to_next_frame(character):
-    window.blit(character.get_fliped_current_frame(), character.get_current_frame_rect())
+    window.blit(character.get_flipped_current_frame(), character.get_current_frame_rect())
     character.pass_to_next_frame()
 
 
@@ -61,17 +66,43 @@ if __name__ == "__main__":
     intro_count = 4
     sound_count = 5
     round_over = False
-
+    rounds = 0
     map = Map()
+
+
+
+    def learn(player1, player2, iterations):
+        for i in range(iterations):
+            player1.reset(200, map.HEIGHT - 210)
+            player2.reset(700, map.HEIGHT - 210)
+            print("newgame " + str(i))
+            while player1.is_alive() and player2.is_alive():
+                player2.stepOne(None)
+                player1.stepOne(None)
+                player2.stepTwo()
+
+                player1.stepTwo()
+
+    guile = Guile(200, map.HEIGHT - 210, map, False, False, True)
+    ryu = Guile(700, map.HEIGHT - 210, map, True, False, True)
+    ryu.set_enemy(guile)
+    guile.set_enemy(ryu)
+
+    learn(guile, ryu, 20000)
+
     window = Window(map)
+    #ryu.set_surface(window.get_window())
+    #guile.set_surface(window.get_window())
+    ryu.set_train(False)
+    guile.set_train(False)
+    ryu.init_frame()
+    guile.init_frame()
+
     map.load_map_frame_list()
     clock = pygame.time.Clock()
     last_count_update = pygame.time.get_ticks()
 
-    guile = Guile(200, map.HEIGHT - 210, map, False, True)
-    ryu = Ryu(700, map.HEIGHT - 210, map, True)
-    ryu.set_ennemy(guile)
-    guile.set_ennemy(ryu)
+
 
     run = True
 
@@ -82,8 +113,16 @@ if __name__ == "__main__":
 
         if intro_count <= 0:
             draw_bg_and_pass_it_to_next_frame()
-            guile.perform_action(events)
-            ryu.perform_action(events)
+
+
+            # ryu.perform_action(events)
+
+            guile.stepOne(events)
+            ryu.stepOne(events)
+            #guile.perform_action(events)
+            guile.stepTwo()
+            ryu.stepTwo()
+
         else:
             if clock.get_time() % 2 == 0:
                 draw_bg_and_pass_it_to_next_frame()
@@ -126,16 +165,14 @@ if __name__ == "__main__":
                 stop_bgm()
                 play_ending()
 
-
         else:
-            draw_character_final_msg(guile, ryu)
-            draw_character_last_state(guile)
-            draw_character_last_state(ryu)
-            # if pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
-            # round_over = False
-            # intro_count = 3
-            # fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
-            # fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
+            # draw_character_final_msg(guile, ryu)
+            # draw_character_last_state(guile)
+            # draw_character_last_state(ryu)
+            rounds += 1
+            round_over = False
+            guile.reset(200, map.HEIGHT - 210)
+            ryu.reset(700, map.HEIGHT - 210)
 
         for event in events:
             if event.type == pygame.QUIT:
@@ -143,3 +180,13 @@ if __name__ == "__main__":
 
         pygame.display.flip()
     # end get inputs
+
+    guile.save(FILE_GUILE)
+    ryu.save(FILE_RYU)
+
+    print(guile.score)
+    print(ryu.score)
+
+    plt.plot(guile.history)
+    plt.plot(ryu.history)
+    plt.show()
