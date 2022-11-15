@@ -273,8 +273,6 @@ class Character:
         else:
             self.punish_player(attack.damage)
 
-    def set_surface(self, surface):
-        self.surface = surface
     def will_attack_hit(self, attack):
         shift = self.hit_box.left - (
                     attack.frame_width - self.CHARACTER_DEFAULT_WIDTH) if self.flip else self.hit_box.right
