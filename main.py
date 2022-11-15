@@ -104,7 +104,7 @@ if __name__ == "__main__":
     map.load_map_frame_list()
     clock = pygame.time.Clock()
     last_count_update = pygame.time.get_ticks()
-
+    end = False
     run = True
 
     while run:
@@ -165,14 +165,16 @@ if __name__ == "__main__":
                 stop_bgm()
                 play_ending()
 
-        else:
-            draw_character_final_msg(guile, ryu)
+        elif not end:
             draw_character_last_state(guile)
             draw_character_last_state(ryu)
+            end = True
             #rounds += 1
             #round_over = False
             #guile.reset(200, map.HEIGHT - 210)
             #ryu.reset(700, map.HEIGHT - 210)
+        else:
+            draw_character_final_msg(guile, ryu)
 
         for event in events:
             if event.type == pygame.QUIT:
