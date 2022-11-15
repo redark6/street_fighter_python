@@ -18,8 +18,11 @@ class AnimationSoundHelper:
         self.__current_animation = action.gif
         self.__character_action_frame_list = load_gif(self.__base_animation_path + action.gif)
 
-    def play_action(self, action, path=None):
-        action.play_sound_action(path)
+    def play_action(self, action, path=None, is_player = False):
+        if action.name == "WIN" or action.name == "LOOSE" and not is_player:
+            print("no loose or win for bot")
+        else:
+            action.play_sound_action(path)
         self.load_action_frame_list(action)
 
     def get_current_frame(self):

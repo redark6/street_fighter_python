@@ -428,7 +428,7 @@ class Character:
 
     def play_action(self, action, path=None):
         if not self.__train:
-            self.animation_sound_helper.play_action(action, path)
+            self.animation_sound_helper.play_action(action, path, self.is_player)
 
     def is_current_frame_first(self):
         if not self.__train:

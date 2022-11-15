@@ -84,7 +84,7 @@ if __name__ == "__main__":
     rounds = 0
     map = Map()
 
-    guile = Guile(200, map.HEIGHT - 210, map, False, False, True)
+    guile = Guile(200, map.HEIGHT - 210, map, False, PLAYER_PLAY, True)
     ryu = Ryu(700, map.HEIGHT - 210, map, True, False, True)
     ryu.set_enemy(guile)
     guile.set_enemy(ryu)
@@ -183,11 +183,9 @@ if __name__ == "__main__":
         pygame.display.flip()
     # end get inputs
 
-    guile.save(FILE_GUILE)
-    ryu.save(FILE_RYU)
-
-    print(guile.score)
-    print(ryu.score)
+    if not PLAYER_PLAY:
+        guile.save(FILE_GUILE)
+        ryu.save(FILE_RYU)
 
     plt.plot(guile.history)
     plt.plot(ryu.history)
