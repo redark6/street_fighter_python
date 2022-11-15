@@ -18,7 +18,7 @@ You will play Guile, the character at the left side of you screen, all sound eff
 ### Xbox controller
 ![xbox controller mapping](https://media.discordapp.net/attachments/773113743034286081/1042186057220886528/image.png)
 
-### keyboard
+### Keyboard
 Q: go back
 D: move forward
 W: jump
