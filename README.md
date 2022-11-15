@@ -7,7 +7,7 @@ Each character has its own set of attack (namely different ranges for the same d
 
 # How to install
 
-Download the IA branch and run the main.py file (requires python 3.10 or above) you will be prompted with the game interface in an IA vs player game mode (you can manually change it to go back to an IA vs IA game mode). The game comes with a pre generated Qtable wich will enable it to run smoothly without the need of training the AI model beforehand.
+Download the "master" branch and run the main.py file (requires python 3.10 or above) you will be prompted with the game interface in an IA vs player game mode (you can manually change it to go back to an IA vs IA game mode). The game comes with a pre generated Qtable wich will enable it to run smoothly without the need of training the AI model beforehand.
 
 To change those settings, refer to How to change the settings section.
 
