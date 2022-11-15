@@ -84,11 +84,11 @@ if __name__ == "__main__":
                 player1.stepTwo()
 
     guile = Guile(200, map.HEIGHT - 210, map, False, False, True)
-    ryu = Guile(700, map.HEIGHT - 210, map, True, False, True)
+    ryu = Ryu(700, map.HEIGHT - 210, map, True, False, True)
     ryu.set_enemy(guile)
     guile.set_enemy(ryu)
 
-    learn(guile, ryu, 20000)
+    learn(guile, ryu, 1000)
 
     window = Window(map)
     #ryu.set_surface(window.get_window())

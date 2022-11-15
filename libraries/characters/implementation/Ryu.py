@@ -6,7 +6,7 @@ from libraries.characters.Character import Character
 
 
 class Ryu(Character):
-    ATTACK_PUNCH = Attack('PUNCH', 'punch.gif', 10, (194, 200), 0.4, play_punch)
+    ATTACK_PUNCH = Attack('PUNCH', 'punch.gif', 10, (164, 200), 0.4, play_punch)
     ATTACK_KICK = Attack('KICK', 'kick.gif', 15, (213, 200), 0.6, play_kick)
     ATTACK_LONG_PUNCH = Attack('LONG_PUNCH', 'long_punch.gif', 20, (326, 200), 0.8, play_long_punch)
 

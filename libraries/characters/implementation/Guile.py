@@ -6,9 +6,9 @@ from libraries.characters.Character import Character
 
 
 class Guile(Character):
-    ATTACK_PUNCH = Attack('PUNCH', 'punch.gif', 10, (310, 200), 0.4, play_punch)
+    ATTACK_PUNCH = Attack('PUNCH', 'punch.gif', 10, (290, 200), 0.4, play_punch)
     ATTACK_KICK = Attack('KICK', 'kick.gif', 15, (233, 200), 0.6, play_kick)
-    ATTACK_LONG_PUNCH = Attack('LONG_PUNCH', 'long_punch.gif', 20, (440, 200), 0.8, play_long_punch)
+    ATTACK_LONG_PUNCH = Attack('LONG_PUNCH', 'long_punch.gif', 20, (326, 200), 0.8, play_long_punch)
 
     CHARACTER_ANIMATION_PATH = 'guile/'
     CHARACTER_DEFAULT_WIDTH = 162

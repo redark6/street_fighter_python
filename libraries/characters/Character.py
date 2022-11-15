@@ -83,7 +83,8 @@ class Character:
         self.__cooling_rate = cooling_rate
         self.__history = []
         self.__last_action = None
-        self.__nothing_counter = 0
+        self.__action_counter = 0
+        self.__special_move_accumulator = 0
 
     def get_flipped_current_frame(self):
         return self.animation_sound_helper.get_flipped_current_frame(self.flip)
@@ -100,6 +101,8 @@ class Character:
 
     def set_enemy(self, enemy):
         self.enemy = enemy
+        self.previous_ennemy_hp = self.enemy.hp
+
 
     def get_hp_ratio(self):
         return self.hp / self.MAX_HEALTH
@@ -219,7 +222,7 @@ class Character:
         return dx
 
     def take_damage(self, damage):
-        self.punish_player((damage * self.damage_ratio * 5))
+        self.punish_player((damage * 50))
         if self.damage_ratio != 1:
             self.reward_player(damage * self.damage_ratio)
         self.hp -= damage * self.damage_ratio
@@ -261,6 +264,7 @@ class Character:
         self.attack(self.ATTACK_LONG_PUNCH)
 
     def attack(self, attack):
+        self.__special_move_accumulator += attack.damage
         self.attacking = True
         self.is_acting = True
         if self.will_attack_hit(attack):
@@ -325,8 +329,8 @@ class Character:
 
     def best_action(self):
         if random() < self.__temperature:
-            print("cooling ")
-            print(self.__temperature)
+            #print("cooling ")
+            #print(self.__temperature)
             self.__temperature *= self.__cooling_rate
             return choice(self.ACTIONS)
         else:
@@ -360,7 +364,7 @@ class Character:
 
     def heat_character_if_threshold_exceed(self):
         if self.successive_loose > self.HEAT_LOOSE_THRESHOLD:
-            print("heat " + self.NAME)
+            #print("heat " + self.NAME)
             self.heat()
             self.successive_loose = 0
 
@@ -386,8 +390,12 @@ class Character:
         #print(key)
         dx = 0
         if not self.is_acting and self.is_alive():
-            if key != self.NOTHING:
-                self.__nothing_counter = 0
+            self.__action_counter += 1
+            if self.__action_counter % 200 == 0 and self.enemy.hp == self.previous_ennemy_hp :
+                print("heat " +self.NAME)
+                self.heat()
+            elif self.__action_counter % 200 == 0 :
+                self.previous_ennemy_hp =  self.enemy.hp
 
             if key == self.BACKWARD:
                 dx = self.backward()
@@ -404,12 +412,12 @@ class Character:
             elif key == self.PUNCH:
                 self.punch()
             elif key == self.LONG_PUNCH:
+                if self.__special_move_accumulator <= (self.ATTACK_LONG_PUNCH.damage * 3):
+                    return dx
                 self.long_punch()
+                self.__special_move_accumulator = 0
             elif key == self.BLOCK:
                 self.block_attack()
-            elif key == self.NOTHING:
-                self.__nothing_counter += 1
-                self.punish_player(2 * self.__nothing_counter)
             else:
                 self.reset_animation()
 
