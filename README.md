@@ -1,4 +1,4 @@
-# Street Fighter Python with AI project
+# Fighter of the street Python with AI project
 
 Hi ! this repository contains a street fighter 2 "like" video game powered by AI, in its core, you will find a classic arcade fighter game with simple mechanics i.e. moving, simple punch, kick, longer range attack, parrying and jumping.
 The point with this project is to train two AI (one for each character) that will enable them to engage in a fight and win it.
